@@ -6,9 +6,9 @@
 The MP3MusicPlayer is a Java-based application designed to provide users with a simple, efficient, and intuitive interface to play MP3 files. It utilizes object-oriented programming principles and incorporates multiple design patterns and features such as exception handling, file handling, and a graphical user interface (GUI).
 
 ### Features
-🎶 Play an MP3 File (Song)
-🎙 Display Title of Song
-👤 Display Artist of Song
+-🎶 Play an MP3 File (Song) 
+-🎙 Display Title of Song
+-👤 Display Artist of Song
 ⏳ Display the Length of the Song
 ⏪ Playback Functionality
 ⏸ Pause Song
