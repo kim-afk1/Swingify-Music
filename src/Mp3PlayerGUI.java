@@ -14,6 +14,7 @@ public class Mp3PlayerGUI extends JFrame {
 
     public static final Color FRAME_COLOR = Color.BLACK;
     public static final Color TEXT_COLOR = Color.WHITE;
+    public static final Color SIDEBAR_COLOR = new Color(18, 18, 18);
 
     private Player musicPlayer;
     private JFileChooser fileChooser;
@@ -24,10 +25,11 @@ public class Mp3PlayerGUI extends JFrame {
 
     private JPanel playbackBtns;
     private JSlider playbackSlider;
+    private JPanel playlistPanel;
 
     public Mp3PlayerGUI() {
         super("Swingify");
-        setSize(650, 550);
+        setSize(750, 550);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -41,12 +43,13 @@ public class Mp3PlayerGUI extends JFrame {
         fileChooser.setFileFilter(new FileNameExtensionFilter("MP3","mp3"));
 
         addGUIComponents();
+        loadPlaylistsFromDirectory();
     }
 
     public void setCurrentMember(Member member) {
         this.currentMember = member;
         if(userLabel != null && member != null) {
-            userLabel.setText("Hello, " + member.getUsername() + "!");
+            userLabel.setText("<html>Hello, <font color='rgb(204,204,0)'>" + member.getUsername() + "!</font></html>");
             userLabel.repaint();
         }
     }
@@ -54,33 +57,40 @@ public class Mp3PlayerGUI extends JFrame {
     private void addGUIComponents() {
         addToolbar();
 
+        // Left sidebar for playlists
+        addPlaylistSidebar();
+
+        // Adjust positions for main content (shifted right)
+        int mainContentX = 220;
+        int mainContentWidth = getWidth() - mainContentX - 20;
+
         userLabel = new JLabel("Not logged in");
-        userLabel.setBounds(getWidth() - 220, 25, 190, 25);
+        userLabel.setBounds(mainContentX + mainContentWidth - 200, 25, 190, 25);
         userLabel.setFont(new Font("Dialog", Font.BOLD, 14));
         userLabel.setForeground(Color.WHITE);
         userLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         add(userLabel);
 
         JLabel songImage = new JLabel(loadImage("src/assets/record.png"));
-        songImage.setBounds(0, 50, getWidth() - 20, 225);
+        songImage.setBounds(mainContentX, 50, mainContentWidth, 225);
         add(songImage);
 
         songTitle = new JLabel("Song title");
-        songTitle.setBounds(0, 285, getWidth()-10, 30);
+        songTitle.setBounds(mainContentX, 285, mainContentWidth, 30);
         songTitle.setFont(new Font("Dialog", Font.BOLD, 24));
         songTitle.setForeground(TEXT_COLOR);
         songTitle.setHorizontalAlignment(SwingConstants.CENTER);
         add(songTitle);
 
         songArtist = new JLabel("Artist");
-        songArtist.setBounds(0, 315, getWidth()-10, 30);
+        songArtist.setBounds(mainContentX, 315, mainContentWidth, 30);
         songArtist.setFont(new Font("Dialog", Font.BOLD, 18));
         songArtist.setForeground(TEXT_COLOR);
         songArtist.setHorizontalAlignment(SwingConstants.CENTER);
         add(songArtist);
 
         playbackSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 0);
-        playbackSlider.setBounds(getWidth()/2 - 300/2, 365, 300, 50);
+        playbackSlider.setBounds(mainContentX + (mainContentWidth/2 - 300/2), 365, 300, 50);
         playbackSlider.setBackground(null);
         playbackSlider.setOpaque(false);
         playbackSlider.setFocusable(false);
@@ -107,6 +117,88 @@ public class Mp3PlayerGUI extends JFrame {
         add(playbackSlider);
 
         addPlaybackBtns();
+    }
+
+    private void addPlaylistSidebar() {
+        JPanel sidebar = new JPanel();
+        sidebar.setBounds(0, 20, getWidth()-520, getHeight() - 20);
+        sidebar.setBackground(SIDEBAR_COLOR);
+        sidebar.setLayout(null);
+
+        JLabel playlistTitle = new JLabel("Playlists");
+        playlistTitle.setBounds(10, 10, 190, 30);
+        playlistTitle.setFont(new Font("Dialog", Font.BOLD, 18));
+        playlistTitle.setForeground(TEXT_COLOR);
+        sidebar.add(playlistTitle);
+
+        JButton addPlaylistBtn = new JButton("+ Add Playlist");
+        addPlaylistBtn.setBounds(10, 50, 210, 35);
+        addPlaylistBtn.setFont(new Font("Dialog", Font.BOLD, 12));
+        addPlaylistBtn.setFocusable(false);
+        addPlaylistBtn.setBackground(new Color(154, 153, 0));
+        addPlaylistBtn.setForeground(Color.WHITE);
+        addPlaylistBtn.setBorderPainted(false);
+        addPlaylistBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MusicPlaylistDialog dialog = new MusicPlaylistDialog(Mp3PlayerGUI.this);
+                dialog.setVisible(true);
+                // Refresh sidebar after dialog closes
+                refreshPlaylistSidebar();
+            }
+        });
+        sidebar.add(addPlaylistBtn);
+
+        // Playlist container with scroll
+        playlistPanel = new JPanel();
+        playlistPanel.setLayout(new BoxLayout(playlistPanel, BoxLayout.Y_AXIS));
+        playlistPanel.setBackground(SIDEBAR_COLOR);
+
+        JScrollPane scrollPane = new JScrollPane(playlistPanel);
+        scrollPane.setBounds(10, 95, 210, getHeight() - 115);
+        scrollPane.setBackground(SIDEBAR_COLOR);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        sidebar.add(scrollPane);
+
+        add(sidebar);
+    }
+
+    public void addPlaylistToSidebar(String playlistName, File playlistFile) {
+        JButton playlistBtn = new JButton(playlistName);
+        playlistBtn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        playlistBtn.setFont(new Font("Dialog", Font.PLAIN, 12));
+        playlistBtn.setForeground(Color.LIGHT_GRAY);
+        playlistBtn.setBackground(SIDEBAR_COLOR);
+        playlistBtn.setHorizontalAlignment(SwingConstants.LEFT);
+        playlistBtn.setBorderPainted(false);
+        playlistBtn.setFocusable(false);
+        playlistBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        playlistBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                playlistBtn.setBackground(new Color(40, 40, 40));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                playlistBtn.setBackground(SIDEBAR_COLOR);
+            }
+        });
+
+        playlistBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                musicPlayer.stopSong();
+                musicPlayer.loadPlaylist(playlistFile);
+            }
+        });
+
+        playlistPanel.add(playlistBtn);
+        playlistPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        playlistPanel.revalidate();
+        playlistPanel.repaint();
     }
 
     private void addToolbar() {
@@ -138,14 +230,17 @@ public class Mp3PlayerGUI extends JFrame {
         });
         songMenu.add(loadSong);
 
-        JMenu playlistMenu = new JMenu("Playlist");
+        /*JMenu playlistMenu = new JMenu("Playlist");
         menuBar.add(playlistMenu);
 
         JMenuItem createPlaylist = new JMenuItem("Create Playlist");
         createPlaylist.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new MusicPlaylistDialog(Mp3PlayerGUI.this).setVisible(true);
+                MusicPlaylistDialog dialog = new MusicPlaylistDialog(Mp3PlayerGUI.this);
+                dialog.setVisible(true);
+                // Refresh sidebar after dialog closes
+                refreshPlaylistSidebar();
             }
         });
         playlistMenu.add(createPlaylist);
@@ -162,10 +257,14 @@ public class Mp3PlayerGUI extends JFrame {
                 if(result==JFileChooser.APPROVE_OPTION && selectedFile!=null) {
                     musicPlayer.stopSong();
                     musicPlayer.loadPlaylist(selectedFile);
+
+                    // Add to sidebar if not already there
+                    String playlistName = selectedFile.getName().replace(".txt", "");
+                    addPlaylistToSidebar(playlistName, selectedFile);
                 }
             }
         });
-        playlistMenu.add(loadPlaylist);
+        playlistMenu.add(loadPlaylist);*/
 
         // Add Account menu
         JMenu accountMenu = new JMenu("Account");
@@ -220,7 +319,7 @@ public class Mp3PlayerGUI extends JFrame {
 
     private void addPlaybackBtns() {
         playbackBtns = new JPanel();
-        playbackBtns.setBounds(0, 435, getWidth()-1, 80);
+        playbackBtns.setBounds(220, 410, getWidth()-220, 80);
         playbackBtns.setBackground(null);
 
         JButton prevButton = new JButton(loadImage("src/assets/previous.png"));
@@ -312,5 +411,31 @@ public class Mp3PlayerGUI extends JFrame {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void loadPlaylistsFromDirectory() {
+        File playlistDir = new File("src/assets");
+        if (playlistDir.exists() && playlistDir.isDirectory()) {
+            File[] files = playlistDir.listFiles(new java.io.FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return pathname.getName().toLowerCase().endsWith(".txt");
+                }
+            });
+
+            if (files != null) {
+                for (File file : files) {
+                    String playlistName = file.getName().replace(".txt", "");
+                    addPlaylistToSidebar(playlistName, file);
+                }
+            }
+        }
+    }
+
+    public void refreshPlaylistSidebar() {
+        playlistPanel.removeAll();
+        loadPlaylistsFromDirectory();
+        playlistPanel.revalidate();
+        playlistPanel.repaint();
     }
 }
