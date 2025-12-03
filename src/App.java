@@ -5,12 +5,18 @@ public class App {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new Mp3PlayerGUI().setVisible(true);
+                Mp3PlayerGUI mp3PlayerGUI = new Mp3PlayerGUI();
 
-                //Song song = new Song("src/assets/Kung Maging Akin Ka.mp3");
-                //System.out.println(song.getTitle());
-                //System.out.println(song.getArtist());
+                MemberList memberList = new MemberList();
+                Member adminAccount = new Member("admin", "admin@spootify.com", "admin");
+                memberList.addMember(adminAccount);
+
+                loginWindow loginDialog = new loginWindow("Login to Swingify", memberList, mp3PlayerGUI);
+                loginDialog.pack();
+                loginDialog.setLocationRelativeTo(null);
+                loginDialog.setVisible(true);
             }
         });
     }
+
 }
