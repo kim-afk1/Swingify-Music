@@ -104,9 +104,12 @@ public class Mp3PlayerGUI extends JFrame {
         CustomSliderUI customUI = new CustomSliderUI(playbackSlider);
         playbackSlider.setUI(customUI);
 
+        playbackSlider.setValueIsAdjusting(false);
+
         playbackSlider.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                playbackSlider.setValueIsAdjusting(true);
                 musicPlayer.pauseSong();
             }
 
@@ -115,7 +118,8 @@ public class Mp3PlayerGUI extends JFrame {
                 JSlider source = (JSlider) e.getSource();
                 int frame = source.getValue();
                 musicPlayer.setCurrentFrame(frame);
-                musicPlayer.setCurrentTimeInMilliseconds((int)(frame / (2.08 * musicPlayer.getCurrentSong().getFrameRatePerMilliseconds())));
+                musicPlayer.setCurrentTimeInMilliseconds((int)(frame / musicPlayer.getCurrentSong().getFrameRatePerMilliseconds()));
+                playbackSlider.setValueIsAdjusting(false);
                 musicPlayer.playCurrentSong();
                 enablePauseButtonDisablePlayButton();
             }
@@ -344,7 +348,9 @@ public class Mp3PlayerGUI extends JFrame {
     }
 
     public void setPlaybackSliderValue(int frame) {
-        playbackSlider.setValue(frame);
+        if(!playbackSlider.getValueIsAdjusting()) {
+            playbackSlider.setValue(frame);
+        }
     }
 
     public void updateSongTitleAndArtist(Song song) {
