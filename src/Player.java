@@ -18,6 +18,8 @@ public class Player extends PlaybackListener {
     private boolean songFinished;
     private boolean pressedNext;
     private boolean pressedPrev;
+    private Thread playbackSliderThread;
+    private volatile boolean stopSliderThread;
 
     public void setCurrentTimeInMilliseconds(int timeInMilliseconds) {
         currentTimeInMilliseconds = timeInMilliseconds;
@@ -45,12 +47,12 @@ public class Player extends PlaybackListener {
             currentTimeInMilliseconds = 0;
             currentSong = playlist.get(0);
             currentFrame = 0;
+            currentPlaylistIndex = 0;
             mp3playerGUI.enablePauseButtonDisablePlayButton();
             mp3playerGUI.updateSongTitleAndArtist(currentSong);
             mp3playerGUI.updatePlaybackSlider(currentSong);
             playCurrentSong();
         }
-
     }
 
     public Player(Mp3PlayerGUI mp3PlayerGUI) {
@@ -80,6 +82,16 @@ public class Player extends PlaybackListener {
     }
 
     public void stopSong() {
+        // Stop the slider thread first
+        stopSliderThread = true;
+        if(playbackSliderThread != null) {
+            try {
+                playbackSliderThread.join(500);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         if(advancedPlayer!=null) {
             advancedPlayer.stop();
             advancedPlayer.close();
@@ -91,10 +103,10 @@ public class Player extends PlaybackListener {
         if(currentSong==null)
             return;
         try {
-            // Reset flags BEFORE starting threads
             songFinished = false;
             pressedNext = false;
             pressedPrev = false;
+            stopSliderThread = false;
 
             FileInputStream fileInputStream = new FileInputStream(currentSong.getFilePath());
             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
@@ -129,10 +141,9 @@ public class Player extends PlaybackListener {
     }
 
     private void startPlaybackSliderThread() {
-        new Thread(new Runnable() {
+        playbackSliderThread = new Thread(new Runnable() {
             @Override
             public void run() {
-
                 if(isPaused) {
                     try {
                         synchronized (playSignal) {
@@ -143,18 +154,26 @@ public class Player extends PlaybackListener {
                     }
                 }
 
-                while(!isPaused && !songFinished && !pressedNext && !pressedPrev) {
+                long startTime = System.currentTimeMillis();
+                long pausedTime = currentTimeInMilliseconds;
+
+                while(!isPaused && !songFinished && !pressedNext && !pressedPrev && !stopSliderThread) {
                     try {
-                        currentTimeInMilliseconds++;
-                        int calculatedFrame = (int) ((double) currentTimeInMilliseconds * 2.08 * currentSong.getFrameRatePerMilliseconds());
+                        long elapsedTime = System.currentTimeMillis() - startTime;
+                        currentTimeInMilliseconds = (int)(pausedTime + elapsedTime);
+
+                        int calculatedFrame = (int)(currentTimeInMilliseconds * currentSong.getFrameRatePerMilliseconds());
+
                         mp3playerGUI.setPlaybackSliderValue(calculatedFrame);
-                        Thread.sleep(1);
+
+                        Thread.sleep(100);
                     } catch(Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
-        }).start();
+        });
+        playbackSliderThread.start();
     }
 
     public Song getCurrentSong() {
@@ -216,10 +235,22 @@ public class Player extends PlaybackListener {
     @Override
     public void playbackFinished(PlaybackEvent evt) {
         System.out.println("Playback finished");
-        if(isPaused) {
-            currentFrame += (int) ((double)evt.getFrame() * currentSong.getFrameRatePerMilliseconds());
-        } else {
 
+        // Stop the slider thread when playback finishes
+        stopSliderThread = true;
+
+        // Wait for slider thread to actually stop
+        if(playbackSliderThread != null) {
+            try {
+                playbackSliderThread.join(200);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(isPaused) {
+            currentFrame += (int)((double)evt.getFrame() * currentSong.getFrameRatePerMilliseconds());
+        } else {
             if(pressedPrev || pressedNext)
                 return;
 
@@ -235,5 +266,4 @@ public class Player extends PlaybackListener {
             }
         }
     }
-
 }
