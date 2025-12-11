@@ -34,7 +34,6 @@ Swingify is a desktop music player application developed in Java using the Swing
 
 
 
-
 # Object-Oriented Programming Principles
 The following Object-Oriented Programming principles are applied in this project:
 
@@ -54,7 +53,7 @@ The following Object-Oriented Programming principles are applied in this project
    - Shows real inheritance in your codebase, not hypothetical examples
      
 4. **Polymorphism**:
-   - Swing component polymorphism → All components treated as Component for layout
+   - Swing component polymorphism → All components treated as *Component* for layout
 
 ## Exception Handling
 The application ensures robustness by incorporating exception handling mechanisms. Key features include:
@@ -72,8 +71,8 @@ The **GUI** is designed to be user-friendly and intuitive. It provides buttons f
 
 ## Design Pattern
 This program utilizes:
-**Singleton** - AudioPlayer & MusicLibrary with implementation code
-**Observer** - Listener interfaces with notification mechanism
+* **Singleton** - AudioPlayer & MusicLibrary with implementation code
+* **Observer** - Listener interfaces with notification mechanism
 
 ### Core Classes
 
@@ -85,4 +84,4 @@ This program utilizes:
 * **`PlaybackController`**: The high-level playback logic layer. Manages playlists, track navigation (next/previous), shuffle/repeat modes, and coordinates between the AudioPlayer and UI. Acts as the "brain" controlling what plays and when.
 * **`MusicLibrary (Singleton)`**: The central data repository. Stores all uploaded songs and user-created playlists. Notifies listeners when the library changes (songs added, playlists created/deleted).
 * **`Song`**: Simple data model representing a music track with a name and file reference.
-* * **`Playlist`**: Collection of songs grouped by user. Can add/remove songs and has a name identifier.
+* **`Playlist`**: Collection of songs grouped by user. Can add/remove songs and has a name identifier.
