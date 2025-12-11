@@ -1,24 +1,37 @@
 
-# MP3MusicPlayer
+### Swingify - Music Player Application
+
+A modern, feature-rich music player built with Java Swing, offering an intuitive interface for managing and playing your music collection.
 
 ## Project Overview
 
-The MP3MusicPlayer is a Java-based application designed to provide users with a simple, efficient, and intuitive interface to play MP3 files. It utilizes object-oriented programming principles and incorporates multiple design patterns and features such as exception handling, file handling, and a graphical user interface (GUI).
+Swingify is a desktop music player application developed in Java using the Swing framework. The project demonstrates object-oriented programming principles, GUI design patterns, and audio playback functionality. It features a complete user authentication system, music library management, playlist creation, and a polished user interface inspired by Spotify.
 
-### Features
-* 🎶 Play an MP3 File (Song).
-* 🎙 Display Title of Song.
-* 👤 Display Artist of Song.
-* ⏳ Display the Length of the Song.
-* ⏪ Playback Functionality.
-* ⏸ Pause Song.
-* ▶ Resume Song.
-* ⏭ Go to next Song in a playlist.
-* ⏮ Go to previous Song in a playlist.
-* 📃 Create a Custom Playlist.
-* 🔃 Load a Custom Playlist.
+## Features
 
-## How It's Made
+# User Authentication
+* Secure login system with username and password
+* Create new user accounts with email validation
+* Password confirmation during registration
+* User session management with logout functionality
+* Persistent user data across sessions
+
+# Music Playback
+* Play, pause, and stop audio files
+* Previous and next track navigation
+* Seek functionality with progress slider
+* Volume control with visual slider
+* Real-time playback progress display
+* Formatted time display (current/total duration)
+* Repeat functionality 
+
+# Playlist Management
+* Create custom playlists
+* Add songs to playlists
+* View all songs in library
+* Delete playlists
+
+
 ### Object-Oriented Programming Principles
 The following Object-Oriented Programming principles are applied in this project:
 
@@ -42,25 +55,18 @@ The **FileManager** class provides functionality to:
 The **GUI** is designed to be user-friendly and intuitive. It provides buttons for basic actions such as play, pause, and stop, as well as a playlist manager. The interface will display the current song and allow users to select different songs from a list.
 
 ## Design Pattern
-The **MVC (Model-View-Controller)** design pattern is implemented to separate the application's data (Model), user interface (View), and control logic (Controller). This helps make the application more maintainable and scalable. Additionally, the **Singleton** pattern is used in the MusicPlayer class to ensure that only one instance of the player exists at a time.
-
-
-## Code Structure
+This program utilizes:
+**Singleton** - AudioPlayer & MusicLibrary with implementation code
+**Observer** - Listener interfaces with notification mechanism
 
 ### Core Classes
 
-* **`Song`**: Represents a single song with attributes like title, artist, and album. Also handles loading MP3 file details.
-* **`Playlist`**: Manages a collection of songs. It supports adding, removing, and listing songs.
-* **`MusicPlayer`**: The main class that controls music playback, and follows the Singleton pattern to ensure only one instance is active.
-* **`FileManager`**: Handles file operations such as saving and loading playlists and user preferences.
-* **`GUI`**: The graphical user interface for interacting with the music player.
-(changes mya aplaly)
-
-### Key Methods
-
-* **`play()`**: Starts playback of the current song.
-* **`pause()`**: Pauses the current song.
-* **`stop()`**: Stops the current song and resets the playback.
-* **`addSong()`**: Adds a song to the current playlist.
-* **`removeSong()`**: Removes a song from the playlist.
-* **(sample, for further changes).
+* **`MusicPlayerApp`**: The entry point of the application. Initializes the member system with a default admin account and launches the login window. Controls the application's startup flow.
+* **`Mp3PlayerGUI`**: The main application window (JFrame). Manages the overall layout with top user info panel, sidebar, and main playback panel. Handles user login state and logout functionality. Acts as the central hub connecting all UI components.
+* **`Member`**: Represents a user account with username, email, and password. Handles login authentication.
+* **`MemberList`**: Manages the collection of all user accounts. Provides methods to add members and validate login credentials.
+* **`AudioPlayer (Singleton)`**: The low-level audio engine. Handles actual audio file playback using Java's Sound API. Manages play/pause/stop operations, volume control, track position, and notifies listeners of state changes. Only supports WAV files.
+* **`PlaybackController`**: The high-level playback logic layer. Manages playlists, track navigation (next/previous), shuffle/repeat modes, and coordinates between the AudioPlayer and UI. Acts as the "brain" controlling what plays and when.
+* **`MusicLibrary (Singleton)`**: The central data repository. Stores all uploaded songs and user-created playlists. Notifies listeners when the library changes (songs added, playlists created/deleted).
+* **`Song`**: Simple data model representing a music track with a name and file reference.
+* * **`Playlist`**: Collection of songs grouped by user. Can add/remove songs and has a name identifier.
