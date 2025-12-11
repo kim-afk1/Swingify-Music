@@ -1,5 +1,5 @@
 
-### Swingify - Music Player Application
+# Swingify - Music Player Application
 
 A modern, feature-rich music player built with Java Swing, offering an intuitive interface for managing and playing your music collection.
 
