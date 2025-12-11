@@ -15,6 +15,7 @@ public class SidebarPanel extends JPanel {
     private MusicLibrary library;
     private PlaybackController controller;
     private JPanel playlistContainer;
+    private MoodSelector moodSelector;
 
     public SidebarPanel(PlaybackController controller) {
         this.controller = controller;
@@ -26,7 +27,18 @@ public class SidebarPanel extends JPanel {
         setBorder(new EmptyBorder(10, 10, 10, 10));
 
         add(createTopIcons(), BorderLayout.NORTH);
-        add(createPlaylistSection(), BorderLayout.CENTER);
+
+        // Create center panel with playlist and mood selector
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBackground(new Color(40, 40, 40));
+
+        centerPanel.add(createPlaylistSection(), BorderLayout.CENTER);
+
+        // Add mood selector at the bottom of center panel
+        moodSelector = new MoodSelector();
+        centerPanel.add(moodSelector, BorderLayout.SOUTH);
+
+        add(centerPanel, BorderLayout.CENTER);
 
         library.addListener(this::refreshPlaylists);
     }
@@ -170,5 +182,9 @@ public class SidebarPanel extends JPanel {
 
         playlistContainer.revalidate();
         playlistContainer.repaint();
+    }
+
+    public MoodSelector getMoodSelector() {
+        return moodSelector;
     }
 }

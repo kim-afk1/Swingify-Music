@@ -1,4 +1,8 @@
-public class Member {
+import java.io.Serializable;
+
+public class Member implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int memberId;
     private final String name;
     private String email;
@@ -16,7 +20,6 @@ public class Member {
         return this.name.equals(name) && this.password.equals(password);
     }
 
-
     public String getEmail() {
         return email;
     }
@@ -25,4 +28,3 @@ public class Member {
         return name;
     }
 }
-

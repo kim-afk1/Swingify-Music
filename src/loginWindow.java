@@ -13,12 +13,12 @@ public class loginWindow extends JDialog {
     private JButton createAccountButton;
     private JLabel loginFeedback;
     private MemberList memberList;
-    private MusicPlayerGUI musicPlayerGUI;
+    private Mp3PlayerGUI mp3PlayerGUI;
 
-    public loginWindow(String title, MemberList memberList, MusicPlayerGUI musicPlayerGUI) {
+    public loginWindow(String title, MemberList memberList, Mp3PlayerGUI mp3PlayerGUI) {
         super();
         this.memberList = memberList;
-        this.musicPlayerGUI = musicPlayerGUI;
+        this.mp3PlayerGUI = mp3PlayerGUI;
         setTitle(title);
         setContentPane(contentPane);
         setModal(true);
@@ -78,15 +78,15 @@ public class loginWindow extends JDialog {
         Member member = memberList.findMember(username, password);
         if(member != null) {
             loginFeedback.setText("Login successful!");
-            musicPlayerGUI.setCurrentMember(member);
+            mp3PlayerGUI.setCurrentMember(member);
 
             dispose();
 
             // Show the MP3 player and bring it to front
-            musicPlayerGUI.setVisible(true);
-            musicPlayerGUI.toFront();
-            musicPlayerGUI.requestFocus();
-            musicPlayerGUI.setState(JFrame.NORMAL);
+            mp3PlayerGUI.setVisible(true);
+            mp3PlayerGUI.toFront();
+            mp3PlayerGUI.requestFocus();
+            mp3PlayerGUI.setState(JFrame.NORMAL);
         } else {
             loginFeedback.setText("Invalid username or password");
         }

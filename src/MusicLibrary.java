@@ -34,6 +34,12 @@ public class MusicLibrary {
         notifyListeners();
     }
 
+    // NEW METHOD: Remove song from the actual library
+    public void removeSong(Song song) {
+        allSongs.remove(song);
+        notifyListeners();
+    }
+
     public List<Song> getAllSongs() {
         return new ArrayList<>(allSongs);
     }
